@@ -24,4 +24,3 @@ export function newDeck (deck) {
     deck
   }
 }
-//DO IN NEED TO INSTALL THUNK?!

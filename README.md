@@ -1,152 +1,91 @@
-# Jan's Would You Rather Project - Twitter Style
+# Jan's Mobile Flashcards Project
 
-The Would You Rather Project is an app that allows you to view different "would you rather" questions asked by different users. You have the ability to see answered and unanswered questions, answer any and view the results of any poll, and as well as create your own "would you rather question". Clicking on the Leader Board page will give you a glance of how you rank amongst other users in the page.
+The mobile flash cards app uses react-native to create a mobile application where you can create new decks and add cards to them. You can view individual decks where you can start the quiz. Once you start the quiz you will be presented with the question with an option to view the answer. The user can declare if they got the question correct or incorrect and after going through all of the cards, you will be presented with a score and options to restart or go back to the Quiz page.
 
-The `_DATA.js` file represents a fake database and methods that let you access the data.   
+We are using Async Local Storage to act as our database.
 
-I used the starter code provided in this application and used [Create React App](https://github.com/facebook/create-react-app) to bootstrap the project.
+I used [Create React Native App](https://github.com/expo/create-react-native-app) to bootstrap the project.
 
 ## TL;DR
 
 To get started opening the project right away:
 
-* clone the project using `git clone https://github.com/jedecast/project-would-you-rather`
+* clone the project using `git clone https://github.com/jedecast/mobile-flashcards`
 * install all project dependencies with `npm install`
-* start the development server with `npm start`
+* start the application with `npm run web` (on web) or `npm run-ios`
+
+## Tested on
+
+This application has been tested on the web and iOS using the expo application on the iPhone
 
 ## What's included
 ```bash
-├── CONTRIBUTING.md
 ├── README.md - This file.
 ├── package.json # npm package manager file. It's unlikely that you'll need to modify this.
-├── public
-│   ├── favicon.ico # React Icon, You may change if you wish.
-│   └── index.html # DO NOT MODIFY
 └── src
     ├── actions
-    │   ├── authedUser.js #handles dispatching Authenticated User to store
-    │   ├── questions.js #handles dispatching new questions and saving replies of existing questions to store
-    │   ├── shared.js #handles initializing data (users and questions) from API to store
-    │   └── users.js #handles dispatching which questions users answered and created to store
+    │   └── index.js #handles actions for dispatching new cards and new decks + receiving initial data
     ├── components
-    │   ├── App.js # Root of app. Checks if AUTHED_USER has been set (not set = show login, set = show dashboard)
-    │   ├── BarPoll.js # Component for the individual poll bar chart
-    │   ├── CreateQuestion.js # Page for creating new questions.
-    │   ├── Dashboard.js  # The home page. Holds two tabs for unanswered/answered questions
-    │   ├── LeaderBoard.js  # The home page. Holds two tabs that toggles between unanswered/answered questions
-    │   ├── Nav.js # Left panel navigation menu. Holds link to /, /add, /leaderboard, and logout button
-    │   ├── QuestionCard.js # Component for rendering individual question cards, the polls, and results
-    │   ├── QuestionPage.js # Page that renders individual question when user navigates to /question/:id
-    │   ├── RightContainer.js # Right container that persists across home, leaderboard, and question creation
-    │   └── SignIn.js # Page that handles dispatching authenticated user to store and loading dashboard
-    ├── middleware
-    │   ├── index.js # Combines and applies thunk and logger
-    │   └── logger.js  # Middleware for console logging actions that affects the store
+    │   ├── AddCard.js # Screen for adding a card into an existing deck
+    │   ├── DeckCard.js # Individual card component for in the DeckList page
+    │   ├── DeckList.js # Holds all of the existing decks in the - also the homescreen
+    │   ├── DeckPage.js  # Individual deck page when a deck has been tapped on
+    │   ├── NewDeck.js  # Screen for creating a new deck and adds it to decklist
+    │   └── QuizView.js # Quiz that handles user taking the quiz, will allow restart and show score
     ├── reducers
-    │   ├── authedUser.js # handles returning the changed state to store that relates to authed user
-    │   ├── index.js # combines authedUser, questions, users, and loading bar reducer to one
-    │   ├── questions.js
-    │   └── users.js
+    │   └── index.js # Handles returning a new state for the redux store
     ├── utils
-    │   ├── _DATA.js  # data api provided in the starter code
-    │   └── api.js # some exportable functions imported from the api
-    ├── index.css # Didn't use index.css starter file. Instead, I used styled components to create a custom design fo the app
-    └── index.js # initiates store
+    │   └── helpers.js # Holds all Async functions for pushing to local storage and fetching
+    ├── App.js # Holds the tabs and stack navigator for navigating around the app
+    └── index.js #
 ```
 
 ## Extra Packages Downloaded
 
-Downloaded react bootstrap (https://react-bootstrap.github.io/) and styled components (https://styled-components.com/) to help with custom styling. Redux and router has also been installed like the previous lessons.
+Downloaded styled components for react-native (https://styled-components.com/) to help with custom styling. Redux and router has also been installed like the previous lessons.
 
 ## Data
 
 There are two types of objects stored in our database:
 
-* Users
-* Questions
+* Decks/Cards
+* Notifications
 
-### Users
+### Decks/Cards
 
-Users include:
+Decks/Cards include:
+* Title of the deck
+* Array of questions
 
-| Attribute    | Type             | Description           |
-|-----------------|------------------|-------------------         |
-| id                 | String           | The user’s unique identifier |
-| name          | String           | The user’s first name  and last name     |
-| avatarURL  | String           | The path to the image file |
-| questions | Array | A list of ids of the polling questions this user created|
-| answers      | Object         |  The object's keys are the ids of each question this user answered. The value of each key is the answer the user selected. It can be either `'optionOne'` or `'optionTwo'` since each question has two options.
+### Notifications
 
-### Questions
+used for storing local notifications
 
-Questions include:
-
-| Attribute | Type | Description |
-|-----------------|------------------|-------------------|
-| id                  | String | The question’s unique identifier |
-| author        | String | The author’s unique identifier |
-| timestamp | String | The time when the question was created|
-| optionOne | Object | The first voting option|
-| optionTwo | Object | The second voting option|
-
-### Voting Options
-
-Voting options are attached to questions. They include:
-
-| Attribute | Type | Description |
-|-----------------|------------------|-------------------|
-| votes             | Array | A list that contains the id of each user who voted for that option|
-| text                | String | The text of the option |
+### Database Methods
 
 Your code will talk to the database via 4 methods:
 
-* `_getUsers()`
-* `_getQuestions()`
-* `_saveQuestion(question)`
-* `_saveQuestionAnswer(object)`
+* `getDecks()`
+* `saveDeckTitle(title)`
+* `addCardToDeck(title,card)`
+* `setDummyData()`
 
-1) `_getUsers()` Method
+1) `getDecks()` Method
 
-*Description*: Get all of the existing users from the database.  
-*Return Value*: Object where the key is the user’s id and the value is the user object.
+*Description*: gets all of the decks in the AsyncStorage in initial mount
 
-2) `_getQuestions()` Method
 
-*Description*: Get all of the existing questions from the database.  
-*Return Value*: Object where the key is the question’s id and the value is the question object.
+2) `saveDeckTitle(title)` Method
 
-3) `_saveQuestion(question)` Method
+*Description*: sets new deck into deck list
+*Parameters*: takes in the user's input for the new deck's title
 
-*Description*: Save the polling question in the database.  
-*Parameters*:  Object that includes the following properties: `author`, `optionOneText`, and `optionTwoText`. More details about these properties:
+3) `addCardToDeck(title,card)` Method
 
-| Attribute | Type | Description |
-|-----------------|------------------|-------------------|
-| author | String | The id of the user who posted the question|
-| optionOneText| String | The text of the first option |
-| optionTwoText | String | The text of the second option |
+*Description*: Adds a new card (question/answer pair) for an existing deck   
+*Parameters*:  Takes in a title of the deck being added a card to and the new card object
 
-*Return Value*:  An object that has the following properties: `id`, `author`, `optionOne`, `optionTwo`, `timestamp`. More details about these properties:
 
-| Attribute | Type | Description |
-|-----------------|------------------|-------------------|
-| id | String | The id of the question that was posted|
-| author | String | The id of the user who posted the question|
-| optionOne | Object | The object has a text property and a votes property, which stores an array of the ids of the users who voted for that option|
-| optionTwo | Object | The object has a text property and a votes property, which stores an array of the ids of the users who voted for that option|
-|timestamp|String | The time when the question was created|
+4) `setDummyData()` Method
 
-4) `_saveQuestionAnswer(object)` Method
-
-*Description*: Save the answer to a particular polling question in the database.
-*Parameters*: Object that contains the following properties: `authedUser`, `qid`, and `answer`. More details about these properties:
-
-| Attribute | Type | Description |
-|-----------------|------------------|-------------------|
-| authedUser | String | The id of the user who answered the question|
-| qid | String | The id of the question that was answered|
-| answer | String | The option the user selected. The value should be either `"optionOne"` or `"optionTwo"`|
-
-## Contributing
-
-This repository is the starter code for *all* Udacity students. Therefore, we most likely will not accept pull requests. For details, check out [CONTRIBUTING.md](https://github.com/udacity/reactnd-project-would-you-rather-starter/blob/master/CONTRIBUTING.md).
+*Description*: Sets in dummy data if there is no existing decks in the User's Local Storage
